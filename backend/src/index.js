@@ -55,6 +55,7 @@ io.on("connection", function(socket) {
   socket.on("disconnect", function() {
     const playerIndex = players.indexOf(socket);
     players.splice(playerIndex, 1);
+    io.sockets.emit("connected_players", players);
   });
 
   socket.on("move", function(data) {
@@ -89,6 +90,7 @@ io.on("connection", function(socket) {
           player.y - fruit.y < playerHeight
         ) {
           player.score = player.score + 1;
+          io.sockets.emit("players_scores", { players });
           fruits.splice(i, 1);
         }
       });
@@ -98,7 +100,9 @@ io.on("connection", function(socket) {
   });
 
   setInterval(() => {
-    createFruit();
-    io.sockets.emit("game_data", { players, fruits });
+    if (fruits.length < (canvasHeight * canvasWidth) / 100) {
+      createFruit();
+      io.sockets.emit("new_fruits", fruits);
+    }
   }, fruitsInterval);
 });
