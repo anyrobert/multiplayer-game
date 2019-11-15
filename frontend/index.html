@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Primeiro Jogo</title>
+  <style>
+    canvas {
+      border: 1px solid #d3d3d3;
+      background-color: #f1f1f1;
+    }
+
+    table {
+      margin: auto;
+    }
+
+    table tr td {
+      text-align: center;
+      padding: 5px 10px;
+    }
+
+    .wrapper {
+      /* display: flex; */
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <canvas id="gameCanvas"></canvas>
+
+    <table>
+      <thead>
+        <th>ID</th>
+        <th>Score</th>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
+  </div>
+
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+
+<script type="text/javascript">
+
+  const socket = io.connect('localhost:3333');
+  //Game variables
+  const playerWidth = 15;
+  const playerHeight = 15
+  const canvasWidth = 600;
+  const canvasHeight = 300;
+  const levelUpSound = new sound("./assets/1up.wav");
+
+  let idSocket;
+
+  const fruits = [], players = []
+
+  socket.on('connected', function (socketId) {
+    idSocket = socketId;
+    socket.emit('new_player', { x: 0, y: 0, score: 0, id: socketId });
+    context.fillStyle = 'red';
+    context.globalAlpha = 1
+    context.fillRect(0, 0, playerWidth, playerHeight)
+  });
+  socket.on('game_setup', function (data) {
+    console.log(data);
+
+  })
+  socket.on('game_data', function ({ players, fruits }) {
+    draw(players, fruits);
+    fruits = [...fruits]
+    players = [...players]
+    drawScore(players);
+  })
+
+  function startGame() {
+    const gameCanvas = document.getElementById('gameCanvas');
+    gameCanvas.width = canvasWidth;
+    gameCanvas.height = canvasHeight;
+
+    const context = gameCanvas.getContext("2d");
+
+    return {
+      gameCanvas,
+      context
+    }
+  }
+
+  function draw(players, fruits) {
+    context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    if (players) {
+      players.forEach(player => {
+        if (player.id === idSocket) {
+          context.fillStyle = 'red';
+          context.globalAlpha = 1
+
+        } else {
+          context.globalAlpha = .1
+          context.fillStyle = '#000';
+
+        }
+        if (player.score !== 0 && Number.isInteger(player.score / 50)) {
+          levelUpSound.play();
+
+        }
+        context.fillRect(player.x, player.y, playerWidth, playerHeight);
+      });
+    }
+    if (fruits) {
+      fruits.forEach(fruit => {
+        context.fillStyle = 'green';
+        context.globalAlpha = .5;
+        context.fillRect(fruit.x, fruit.y, playerWidth, playerHeight);
+      });
+    }
+
+  }
+  const { context, gameCanvas } = startGame();
+
+  document.addEventListener('keydown', event => {
+    handleKeyPress(event.key);
+  })
+
+  function handleKeyPress(key) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft'].includes(key)) {
+      socket.emit('move', { playerId: idSocket, key });
+    }
+
+  }
+
+  function drawScore(players) {
+    const sortedPlayers = players.sort(getHighScore);
+    let tableData = '';
+    for (i = 0; i < sortedPlayers.length; i++) {
+      tableData += '<tr>';
+      tableData += '<td>' + sortedPlayers[i].id + '</td>';
+      tableData += '<td>' + sortedPlayers[i].score + '</td>';
+      tableData += '</tr>';
+    }
+    document.querySelector('tbody').innerHTML = tableData
+  }
+
+  function getHighScore(a, b) {
+    if (a.score > b.score) {
+      return -1;
+    }
+    if (a.score < b.score) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function () {
+      this.sound.play();
+    }
+    this.stop = function () {
+      this.sound.pause();
+    }
+  }
+
+</script>
+
+</html>
