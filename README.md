@@ -4,5 +4,4 @@
 - Project setup: 
 ````
   cd backend && yarn && yarn dev
-
 ````
