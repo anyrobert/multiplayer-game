@@ -17,16 +17,26 @@
     }
 
     canvas {
-      border: 1px solid #d3d3d3;
-      background-color: #f1f1f1;
+      box-shadow: 3px 3px 17px 2px rgba(138, 43, 226, .3);
+      background-color: #f2f2f2;
       width: 49%;
+      border-radius: 4px;
 
     }
 
     table {
-      box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, .1);
+      box-shadow: 3px 3px 10px 2px rgba(138, 43, 226, .1);
+      background: rgba(138, 43, 226, .6);
       border-radius: 4px;
       width: 49%;
+      color: white;
+
+    }
+
+    table tbody tr.player td {
+      border-radius: 4px;
+      background: white;
+      color: #000;
     }
 
     table tr td {
@@ -82,7 +92,7 @@
 
     .loader div {
       position: absolute;
-      border: 4px solid purple;
+      border: 4px solid #8A2BE2;
       opacity: 1;
       border-radius: 50%;
       animation: loader 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
@@ -133,11 +143,13 @@
     <div></div>
     <div></div>
   </div>
-
+  <!-- <div class="admin-controls">
+    <button onclick="handleStartGame()">Play/pause</button>
+  </div> -->
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
-
+<script src="../utils/index.js"></script>
 <script type="text/javascript">
 
   const socket = io.connect('localhost:3333');
@@ -150,6 +162,7 @@
   const playerHeight = 15
   const canvasWidth = 600;
   const canvasHeight = 300;
+  const gameMovement = 15;
   const levelUpSound = new sound("./assets/1up.wav");
 
   let idSocket;
@@ -167,6 +180,10 @@
     stopLoading();
     idSocket = socketId;
     const newPlayer = { x: 0, y: 0, score: 0, id: socketId }
+    newPlayer.x =
+      getRandomInt(0, Math.floor(canvasWidth / gameMovement)) * gameMovement;
+    newPlayer.y =
+      getRandomInt(0, Math.floor(canvasHeight / gameMovement)) * gameMovement;
     setPlayers([newPlayer]);
 
     socket.emit('new_player', newPlayer);
@@ -212,7 +229,7 @@
     if (players) {
       players.forEach(player => {
         if (player.id === idSocket) {
-          context.fillStyle = 'red';
+          context.fillStyle = 'rgb(138, 43, 226)';
           context.globalAlpha = 1
           if (player.score !== 0 && Number.isInteger(player.score / 50)) {
             levelUpSound.play();
@@ -228,8 +245,8 @@
     }
     if (fruits) {
       fruits.forEach(fruit => {
-        context.fillStyle = 'yellow';
-        context.globalAlpha = .5;
+        context.fillStyle = 'red';
+        context.globalAlpha = .2;
         context.fillRect(fruit.x, fruit.y, playerWidth, playerHeight);
       });
     }
@@ -251,13 +268,17 @@
 
   function drawScore() {
     const sortedPlayers = players.sort(getHighScore);
+
     let tableData = '';
-    for (i = 0; i < sortedPlayers.length; i++) {
-      tableData += '<tr>';
-      tableData += '<td>' + sortedPlayers[i].id + '</td>';
-      tableData += '<td>' + sortedPlayers[i].score + '</td>';
-      tableData += '</tr>';
-    }
+    sortedPlayers.forEach(player => {
+      tableData += `
+        <tr class="${player.id === idSocket && 'player'}">
+          <td>${player.id}</td>
+          <td>${player.score}</td>
+        </tr>
+      `
+    });
+
     document.querySelector('tbody').innerHTML = tableData
   }
 
@@ -308,11 +329,18 @@
     }, {});
 
   if (params.admin) {
-    const AdminDiv = document.createElement('div');
-    AdminDiv.className = 'admin-controls';
-    const DivContent = document.createTextNode("Hi admin");
-    AdminDiv.appendChild(DivContent);
-    document.body.append(AdminDiv);
+    function handleStartGame() {
+      socket.emit('start_game');
+
+    }
+    // const AdminDiv = document.createElement('div');
+    // AdminDiv.className = 'admin-controls';
+    // const DivContent = document.createElement('botton');
+    // DivContent.onclick = function (){
+
+    // }
+    // AdminDiv.appendChild(DivContent);
+    // document.body.append(AdminDiv);
   }
 </script>
 

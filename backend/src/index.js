@@ -57,7 +57,9 @@ io.on("connection", function(socket) {
     players.splice(playerIndex, 1);
     io.sockets.emit("connected_players", players);
   });
-
+  socket.on("start_game", function() {
+    console.log("start");
+  });
   socket.on("move", function(data) {
     const player = players.find(el => el.id === data.playerId);
     if (player) {
