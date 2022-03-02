@@ -1,0 +1,24 @@
+{
+  "name": "multiplayer-game",
+  "version": "0.0.1",
+  "description": "socket io multiplayer game",
+  "scripts": {
+    "backend:start": "cd backend && npm start"
+  },
+  "workspaces": [
+    "backend",
+    "frontend",
+    "utils"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anyrobert/multiplayer-game.git"
+  },
+  "keywords": [],
+  "author": "Robert Gabriel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anyrobert/multiplayer-game/issues"
+  },
+  "homepage": "https://github.com/anyrobert/multiplayer-game#readme"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "utils",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anyrobert/multiplayer-game.git"
+  },
+  "keywords": [],
+  "author": "Robert Gabriel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anyrobert/multiplayer-game/issues"
+  },
+  "homepage": "https://github.com/anyrobert/multiplayer-game#readme"
+}
