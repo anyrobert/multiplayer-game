@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "socket io multiplayer game",
   "scripts": {
-    "backend:start": "cd backend && npm start"
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "dev": "docker-compose -f ./docker-compose.dev.yaml up"
   },
   "workspaces": [
     "backend",
