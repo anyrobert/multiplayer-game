@@ -6,7 +6,7 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/api
-
+      - /api/node_modules
     command: npm start
 
   frontend:
