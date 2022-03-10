@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/api
+
+    command: npm run dev
+
+  frontend:
+    image: nginx
+    ports:
+      - 8000:80
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./utils:/usr/share/nginx/html/utils
+    depends_on:
+      - api
+    links:
+      - api
