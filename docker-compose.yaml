@@ -6,6 +6,9 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/api
+
+    command: npm start
+
   frontend:
     image: nginx
     ports:
