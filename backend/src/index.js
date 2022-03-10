@@ -1,7 +1,7 @@
 const app = require("express")();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
-const port = 3333;
+const port = 3000;
 
 server.listen(port);
 
@@ -25,7 +25,7 @@ function getRandomInt(min, max) {
 function createFruit() {
   const fruit = {
     x: 0,
-    y: 0
+    y: 0,
   };
 
   fruit.x =
@@ -36,7 +36,7 @@ function createFruit() {
   fruits.push(fruit);
 }
 
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
   socket.emit("connected", socket.id);
   socket.emit("game_setup", {
     playerWidth,
@@ -44,24 +44,24 @@ io.on("connection", function(socket) {
     fruitsInterval,
     gameMovement,
     canvasHeight,
-    canvasWidth
+    canvasWidth,
   });
 
-  socket.on("new_player", function(player) {
+  socket.on("new_player", function (player) {
     players.push(player);
     io.sockets.emit("connected_players", players);
   });
 
-  socket.on("disconnect", function() {
+  socket.on("disconnect", function () {
     const playerIndex = players.indexOf(socket);
     players.splice(playerIndex, 1);
     io.sockets.emit("connected_players", players);
   });
-  socket.on("start_game", function() {
+  socket.on("start_game", function () {
     console.log("start");
   });
-  socket.on("move", function(data) {
-    const player = players.find(el => el.id === data.playerId);
+  socket.on("move", function (data) {
+    const player = players.find((el) => el.id === data.playerId);
     if (player) {
       if (data.key === "ArrowUp") {
         if (player.y - gameMovement < 0) {
